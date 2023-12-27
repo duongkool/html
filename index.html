@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Tool</title>
+    <!-- Thêm thư viện clipboard.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.10/clipboard.min.js"></script>
+</head>
+
+<body>
+    <h1>HTML Tool</h1>
+
+    <textarea id="inputHtml" placeholder="Paste your HTML here..." style="width: 100%; height: 200px;"></textarea>
+    <br>
+    <button onclick="processHtml()">Process HTML</button>
+
+    <h2>Modified HTML:</h2>
+    <button id="copyButton" data-clipboard-target="#outputHtml">Copy</button>
+
+    <div id="outputHtml" style="white-space: pre-wrap;"></div>
+
+    <!-- Thêm nút Copy -->
+
+    <script>
+        function removeAnchorTags(htmlString) {
+            // Tạo một DOMParser
+            const parser = new DOMParser();
+
+            // Chuyển đổi chuỗi HTML thành một cây DOM
+            const doc = parser.parseFromString(htmlString, 'text/html');
+
+            // Lấy tất cả các thẻ a
+            const anchorTags = doc.querySelectorAll('a');
+
+            // Duyệt qua từng thẻ a
+            anchorTags.forEach(anchor => {
+                // Tạo một phần tử span mới
+                const span = doc.createElement('span');
+
+                // Di chuyển tất cả các nút con của thẻ a vào span
+                while (anchor.firstChild) {
+                    span.appendChild(anchor.firstChild);
+                }
+
+                // Thay thế thẻ a bằng nội dung của span
+                anchor.parentNode.replaceChild(span, anchor);
+            });
+
+            // Trả về nội dung HTML đã được chỉnh sửa
+            return doc.body.innerHTML;
+        }
+
+
+        function processHtml() {
+            // Lấy đoạn văn bản HTML từ textarea
+            const inputHtml = document.getElementById('inputHtml').value;
+
+            // Sử dụng hàm removeAnchorTags để xử lý HTML
+            const modifiedHtml = removeAnchorTags(inputHtml);
+
+            // Hiển thị kết quả trong div
+            document.getElementById('outputHtml').textContent = modifiedHtml;
+
+            // Hiển thị nút Copy nếu kết quả có nội dung
+            const copyButton = document.getElementById('copyButton');
+            copyButton.style.display = modifiedHtml ? 'inline-block' : 'none';
+        }
+
+        // Khởi tạo ClipboardJS
+        const clipboard = new ClipboardJS('#copyButton');
+
+        // Xử lý sự kiện sao chép thành công
+        clipboard.on('success', function (e) {
+            alert('Copied to clipboard!');
+        });
+    </script>
+</body>
+
+</html>
